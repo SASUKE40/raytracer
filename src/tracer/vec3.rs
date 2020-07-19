@@ -32,26 +32,26 @@ impl Sub for Vec3 {
     }
 }
 
-impl Mul for Vec3 {
+impl Mul<f32> for Vec3 {
     type Output = Vec3;
 
-    fn mul(self, rhs: Self) -> Self::Output {
+    fn mul(self, rhs: f32) -> Vec3 {
         Vec3 {
-            x: self.x * rhs.x,
-            y: self.y * rhs.y,
-            z: self.z * rhs.z,
+            x: self.x * rhs,
+            y: self.y * rhs,
+            z: self.z * rhs,
         }
     }
 }
 
-impl Div for Vec3 {
+impl Div<f32> for Vec3 {
     type Output = Vec3;
 
-    fn div(self, rhs: Self) -> Self::Output {
+    fn div(self, rhs: f32) -> Vec3 {
         Vec3 {
-            x: self.x / rhs.x,
-            y: self.y / rhs.y,
-            z: self.z / rhs.z,
+            x: self.x / rhs,
+            y: self.y / rhs,
+            z: self.z / rhs,
         }
     }
 }
@@ -84,15 +84,81 @@ impl Vec3 {
     pub fn dot(u: Vec3, v: Vec3) -> f32 {
         u.x * v.x + u.y * v.y + u.z * v.z
     }
+
+    pub fn length(&self) -> f32 {
+        (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
+    }
+
+    pub fn unit_vector(&self) -> Vec3 {
+        *self / self.length()
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::Vec3;
+
+    #[test]
+    fn test_eq() {
+        assert_eq!(Vec3::new(1.0, -2.0, 0.0), Vec3::new(1.0, -2.0, 0.0));
+        assert_ne!(Vec3::new(1.0, -2.0, 0.0), Vec3::new(-1.0, 0.0, 0.0));
+    }
+
     #[test]
     fn test_add() {
-        let vec1 = Vec3::new(1.0, 2.0, 3.0) + Vec3::new(1.0, -3.0, 1.0);
-        let vec2 = Vec3::new(2.0, -1.0, 4.0);
-        assert_eq!(vec1, vec2)
+        let vec1 = Vec3::new(1.0, 2.0, 3.0) + Vec3::new(4.0, -5.0, 0.0);
+        let vec2 = Vec3::new(5.0, -3.0, 3.0);
+        assert_eq!(vec1, vec2);
+    }
+
+    #[test]
+    fn test_sub() {
+        let vec1 = Vec3::new(1.0, 2.0, 3.0) - Vec3::new(4.0, -5.0, 0.0);
+        let vec2 = Vec3::new(-3.0, 7.0, 3.0);
+        assert_eq!(vec1, vec2);
+    }
+
+    #[test]
+    fn test_mul() {
+        assert_eq!(Vec3::new(1.0, -2.0, 0.0) * 5.0, Vec3::new(5.0, -10.0, 0.0));
+    }
+
+    #[test]
+    fn test_div() {
+        assert_eq!(Vec3::new(1.0, -2.0, 0.0) / 2.0, Vec3::new(0.5, -1.0, 0.0));
+    }
+
+    #[test]
+    fn test_neg() {
+        assert_eq!(-Vec3::new(1.0, -2.0, 3.0), Vec3::new(-1.0, 2.0, -3.0));
+    }
+
+    #[test]
+    fn test_dot() {
+        assert_eq!(
+            Vec3::dot(Vec3::new(1.0, 2.0, 3.0), Vec3::new(-2.0, 2.0, 3.0)),
+            -2.0 + 4.0 + 9.0
+        )
+    }
+
+    #[test]
+    fn test_cross() {
+        assert_eq!(
+            Vec3::cross(Vec3::new(1.0, 2.0, 3.0), Vec3::new(2.0, 3.0, 4.0)),
+            Vec3::new(8.0 - 9.0, 6.0 - 4.0, 3.0 - 4.0)
+        )
+    }
+
+    #[test]
+    fn test_length() {
+        assert_eq!(Vec3::new(2.0, -2.0, 1.0).length(), 3.0);
+    }
+
+    #[test]
+    fn test_unit() {
+        assert_eq!(
+            Vec3::new(2.0, -2.0, 1.0).unit_vector(),
+            Vec3::new(2.0 / 3.0, -2.0 / 3.0, 1.0 / 3.0)
+        );
     }
 }
